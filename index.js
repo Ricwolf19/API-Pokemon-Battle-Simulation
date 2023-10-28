@@ -1,71 +1,112 @@
-async function fetchPokemons() {
-    // Realiza una solicitud a la API de Pokemon para obtener información sobre los primeros 150 Pokemon.
-    const response = await fetch('https://pokeapi.co/api/v2/pokemon?offset=150&limit=150');
-    const data = await response.json();
-  
-    // Obtiene referencias a los elementos 'select' en el documento HTML.
-    const select1 = document.getElementById('pokemon1');
-    const select2 = document.getElementById('pokemon2');
-    const select3 = document.getElementById('pokemon3');
-  
-    // Itera a través de la lista de Pokemon obtenida y crea opciones para los tres elementos 'select'.
-    data.results.forEach(pokemon => {
-      const option = document.createElement('option');
-      option.text = pokemon.name;
-      option.value = pokemon.url;
-  
-      select1.add(option.cloneNode(true));
-      select2.add(option.cloneNode(true));
-      select3.add(option.cloneNode(true));
-    });
-  
-    // Habilita el segundo 'select' cuando se selecciona un Pokemon en el primer 'select'.
-    select1.onchange = () => { select2.disabled = false; fetchPokemonImage('pokemon1'); };
-    // Habilita el tercer 'select' cuando se selecciona un Pokemon en el segundo 'select'.
-    select2.onchange = () => { select3.disabled = false; fetchPokemonImage('pokemon2'); };
-    // Llama a la función fetchPokemonImage para cargar la imagen del Pokemon seleccionado en el tercer 'select'.
-    select3.onchange = () => { fetchPokemonImage('pokemon3'); };
+class Stack {
+  constructor() {
+    this.items = [];
   }
-  
-  async function fetchPokemonImage(pokemonId) {
-    // Obtiene la URL del Pokemon seleccionado en el elemento 'select'.
-    const select = document.getElementById(pokemonId);
+
+  push(element) {
+    this.items.push(element);
+  }
+
+  pop() {
+    if (this.items.length === 0) return 'Underflow';
+    return this.items.pop();
+  }
+
+  getTop() {
+    return this.items[this.items.length - 1];
+  }
+
+  isEmpty() {
+    return this.items.length === 0;
+  }
+}
+
+let team1Stack = new Stack();
+let team2Stack = new Stack();
+
+async function fetchPokemons() {
+  const response = await fetch('https://pokeapi.co/api/v2/pokemon?offset=150&limit=150');
+  const data = await response.json();
+
+  const select1 = document.getElementById('pokemon1');
+  const select2 = document.getElementById('pokemon2');
+  const select3 = document.getElementById('pokemon3');
+
+  data.results.forEach(pokemon => {
+    const option = document.createElement('option');
+    option.text = pokemon.name;
+    option.value = pokemon.url;
+
+    select1.add(option.cloneNode(true));
+    select2.add(option.cloneNode(true));
+    select3.add(option.cloneNode(true));
+  });
+
+  select1.onchange = () => {
+    select2.disabled = false;
+    fetchPokemonImage('pokemon1', team1Stack);
+  };
+  select2.onchange = () => {
+    select3.disabled = false;
+    fetchPokemonImage('pokemon2', team1Stack);
+  };
+  select3.onchange = () => {
+    fetchPokemonImage('pokemon3', team1Stack);
+  };
+}
+
+async function fetchPokemonImage(pokemonId, stack) {
+  const select = document.getElementById(pokemonId);
+  const response = await fetch(select.value);
+  const data = await response.json();
+
+  document.getElementById(pokemonId + 'Image').src = data.sprites.front_default;
+
+  stack.push({ name: data.name, power: data.stats.reduce((total, stat) => total + stat.base_stat, 0) });
+}
+
+// Resto del código previamente proporcionado...
+
+async function startBattle() {
+  const team1Container = document.getElementById('team1');
+  const select1 = document.getElementById('pokemon1');
+  const select2 = document.getElementById('pokemon2');
+  const select3 = document.getElementById('pokemon3');
+
+  // Limpiar contenedores de equipos antes de iniciar la batalla
+  team1Container.innerHTML = '';
+
+  // Verificar si se han seleccionado los 3 Pokémon
+  if (select1.value === "" || select2.value === "" || select3.value === "") {
+    alert("Please select 3 Pokémon to start the battle!");
+    return;
+  }
+
+  // Agregar imágenes de los Pokémon seleccionados
+  const pokemons = [select1, select2, select3];
+  for (let i = 0; i < pokemons.length; i++) {
+    const select = pokemons[i];
     const response = await fetch(select.value);
     const data = await response.json();
-  
-    // Actualiza la imagen del Pokemon en el elemento 'img'.
-    document.getElementById(pokemonId + "Image").src = data.sprites.front_default;
+    
+    const pokemonImage = document.createElement('img');
+    pokemonImage.src = data.sprites.front_default;
+    team1Container.appendChild(pokemonImage);
+
+    team1Stack.push({ name: data.name, power: data.stats.reduce((total, stat) => total + stat.base_stat, 0) });
   }
-  
-  async function startBattle() {
-    // Obtiene las URL de los Pokemon seleccionados en los tres 'select'.
-    const select1 = document.getElementById('pokemon1');
-    const select2 = document.getElementById('pokemon2');
-    const select3 = document.getElementById('pokemon3');
-    const options = [select1.value, select2.value, select3.value];
-  
-    // Selecciona al azar uno de los Pokemon como el ganador de la batalla.
-    const winnerIndex = Math.floor(Math.random() * options.length);
-    const finalistsIndexes = options.filter((value, index) => index !== winnerIndex);
-  
-    // Obtiene información sobre el Pokemon ganador.
-    const response = await fetch(options[winnerIndex]);
-    const data = await response.json();
-  
-    // Muestra el nombre y la imagen del Pokemon ganador.
-    document.getElementById("winnerName").innerHTML = data.name;
-    document.getElementById("winnerImage").src = data.sprites.front_default;
-  
-    // Obtiene información sobre los finalistas y muestra sus imágenes.
-    finalistsIndexes.forEach(async (url, index) => {
-      const res = await fetch(url);
-      const finalistData = await res.json();
-  
-      // Muestra las imágenes de los finalistas.
-      document.getElementById(`finalist${index + 1}Image`).src = finalistData.sprites.front_default;
-    });
+
+  const opponentContainer = document.getElementById('opponentTeam');
+  while (!team2Stack.isEmpty()) {
+    let pokemon2 = team2Stack.pop();
+    const opponentPokemonImage = document.createElement('img');
+    opponentPokemonImage.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon2.name}.png`;
+    opponentContainer.appendChild(opponentPokemonImage);
   }
-  
-  // Inicia la función para cargar la información de los Pokemon.
-  fetchPokemons();
-  
+
+  let winnerTeam = team1Stack.isEmpty() ? 'Opponent' : 'Your Team';
+  document.getElementById('winnerName').innerHTML = `The winner is: ${winnerTeam}`;
+}
+
+fetchPokemons();
+

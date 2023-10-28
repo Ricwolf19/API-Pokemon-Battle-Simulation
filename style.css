@@ -12,7 +12,8 @@ body {
     text-align: center;
   }
   .pokemon-container img {
-    max-width: 150px;
+    max-width: 250px;
+    width: 150px;
     display: block;
     margin: 0 auto;
   }
