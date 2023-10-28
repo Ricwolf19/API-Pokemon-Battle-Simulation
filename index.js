@@ -65,30 +65,30 @@ async function fetchPokemonImage(pokemonId, stack) {
   stack.push({ name: data.name, power: data.stats.reduce((total, stat) => total + stat.base_stat, 0) });
 }
 
-// Resto del código previamente proporcionado...
-
 async function startBattle() {
   const team1Container = document.getElementById('team1');
   const select1 = document.getElementById('pokemon1');
   const select2 = document.getElementById('pokemon2');
   const select3 = document.getElementById('pokemon3');
+  const opponentContainer = document.getElementById('opponentTeam');
 
-  // Limpiar contenedores de equipos antes de iniciar la batalla
+  
   team1Container.innerHTML = '';
+  opponentContainer.innerHTML = '';
 
-  // Verificar si se han seleccionado los 3 Pokémon
+
   if (select1.value === "" || select2.value === "" || select3.value === "") {
     alert("Please select 3 Pokémon to start the battle!");
     return;
   }
 
-  // Agregar imágenes de los Pokémon seleccionados
-  const pokemons = [select1, select2, select3];
-  for (let i = 0; i < pokemons.length; i++) {
-    const select = pokemons[i];
+
+  const yourTeam = [select1, select2, select3];
+  for (let i = 0; i < yourTeam.length; i++) {
+    const select = yourTeam[i];
     const response = await fetch(select.value);
     const data = await response.json();
-    
+
     const pokemonImage = document.createElement('img');
     pokemonImage.src = data.sprites.front_default;
     team1Container.appendChild(pokemonImage);
@@ -96,12 +96,31 @@ async function startBattle() {
     team1Stack.push({ name: data.name, power: data.stats.reduce((total, stat) => total + stat.base_stat, 0) });
   }
 
-  const opponentContainer = document.getElementById('opponentTeam');
-  while (!team2Stack.isEmpty()) {
-    let pokemon2 = team2Stack.pop();
+  for (let i = 0; i < 3; i++) { 
+    let random = Math.floor(Math.random() * 150) + 1;
+    let res = await fetch(`https://pokeapi.co/api/v2/pokemon/${random}/`);
+    let data = await res.json();
+    let power = data.stats.reduce((total, stat) => total + stat.base_stat, 0);
+
     const opponentPokemonImage = document.createElement('img');
-    opponentPokemonImage.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon2.name}.png`;
+    opponentPokemonImage.src = data.sprites.front_default;
     opponentContainer.appendChild(opponentPokemonImage);
+
+    team2Stack.push({ name: data.name, power: power });
+  }
+
+ 
+  while (!team1Stack.isEmpty() && !team2Stack.isEmpty()) {
+    let yourPokemon = team1Stack.pop();
+    let opponentPokemon = team2Stack.pop();
+
+    if (yourPokemon.power > opponentPokemon.power) {
+     
+    } else if (yourPokemon.power < opponentPokemon.power) {
+     
+    } else {
+     
+    }
   }
 
   let winnerTeam = team1Stack.isEmpty() ? 'Opponent' : 'Your Team';
@@ -109,4 +128,6 @@ async function startBattle() {
 }
 
 fetchPokemons();
+
+
 
