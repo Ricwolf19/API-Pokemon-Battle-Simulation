@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container mt-3">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="pokemon-container">
+          <select id="pokemon1" class="form-control mb-3" onchange="fetchPokemonImage('pokemon1')"></select>
+          <img id="pokemon1Image" src="" alt="Pokemon 1">
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="pokemon-container">
+          <select id="pokemon2" class="form-control mb-3" disabled onchange="fetchPokemonImage('pokemon2')"></select>
+          <img id="pokemon2Image" src="" alt="Pokemon 2">
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="pokemon-container">
+          <select id="pokemon3" class="form-control mb-3" disabled onchange="fetchPokemonImage('pokemon3')"></select>
+          <img id="pokemon3Image" src="" alt="Pokemon 3">
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <button class="btn btn-primary" onclick="startBattle()">Start Battle</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="pokemon-container">
+          <h2 class="text-center">The finalists are:</h2>
+          <img id="finalist1Image" src="" alt="Finalist Pokemon 1">
+          <img id="finalist2Image" src="" alt="Finalist Pokemon 2">
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="pokemon-container">
+          <h2 class="text-center">The winner is:</h2>
+          <p id="winnerName"></p>
+          <img id="winnerImage" src="" alt="Winner Pokemon">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>
