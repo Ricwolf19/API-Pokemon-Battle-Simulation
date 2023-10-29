@@ -34,5 +34,5 @@ The application simulates a Pok√©mon battle, allowing users to select three Pok√
 ## Preview
 
 <div align="center">
-  <img src="imgs/preview.png" alt="Pokemon Battle Simulation" style="width: 250px; height: 250px;">
+  <img src="imgs/preview.png" alt="Pokemon Battle Simulation" style="width: 650px; height: 450px;">
 </div>
