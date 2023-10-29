@@ -72,16 +72,16 @@ async function startBattle() {
   const select3 = document.getElementById('pokemon3');
   const opponentContainer = document.getElementById('opponentTeam');
 
-  
   team1Container.innerHTML = '';
   opponentContainer.innerHTML = '';
-
 
   if (select1.value === "" || select2.value === "" || select3.value === "") {
     alert("Please select 3 Pokémon to start the battle!");
     return;
   }
 
+  team1Stack = new Stack();
+  team2Stack = new Stack();
 
   const yourTeam = [select1, select2, select3];
   for (let i = 0; i < yourTeam.length; i++) {
@@ -109,21 +109,20 @@ async function startBattle() {
     team2Stack.push({ name: data.name, power: power });
   }
 
- 
+  let winnerTeam;
   while (!team1Stack.isEmpty() && !team2Stack.isEmpty()) {
     let yourPokemon = team1Stack.pop();
     let opponentPokemon = team2Stack.pop();
 
     if (yourPokemon.power > opponentPokemon.power) {
-     
+      winnerTeam = 'Your Team';
     } else if (yourPokemon.power < opponentPokemon.power) {
-     
+      winnerTeam = 'Opponent';
     } else {
-     
+      winnerTeam = 'Draw';
     }
   }
 
-  let winnerTeam = team1Stack.isEmpty() ? 'Opponent' : 'Your Team';
   document.getElementById('winnerName').innerHTML = `The winner is: ${winnerTeam}`;
 }
 
